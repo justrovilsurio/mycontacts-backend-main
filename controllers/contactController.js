@@ -2,7 +2,6 @@
 // this eliminateds the need of try catch block in each function
 const asyncHandler = require("express-async-handler");
 
-
 // whenever we interact with mongodb and mongoose, we receive a promise
 
 //@desc Get all contacts
