@@ -3,7 +3,6 @@
 const asyncHandler = require("express-async-handler");
 
 
-
 // whenever we interact with mongodb and mongoose, we receive a promise
 
 //@desc Get all contacts
