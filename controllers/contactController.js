@@ -1,6 +1,7 @@
 // to catch errors in async functions we will use a middeware called express-async-handler package
 // this eliminateds the need of try catch block in each function
 const asyncHandler = require("express-async-handler");
+const Contact = require("../models/contactModel");
 
 // whenever we interact with mongodb and mongoose, we receive a promise
 
@@ -9,7 +10,8 @@ const asyncHandler = require("express-async-handler");
 //@access Public --  this will be private when we implement authentication
 
 const getContacts = asyncHandler (async (req, res) => {
-    res.status(200).json({ message: "Get all contacts!" });
+    const contacts = await Contact.find();
+    res.status(200).json(contacts);
 });
 
 //@desc Create New contact
@@ -24,7 +26,13 @@ const createContact = asyncHandler (async (req, res) => {
         throw new Error("All fields are mandatory!");
     }
 
-    res.status(201).json({ message: "Create Contact" });
+    // creating the contact object in the database
+    const contact = await Contact.create({
+        name,
+        email,
+        phone
+    });
+    res.status(201).json(contact);
 });
 
 //@desc Update contact
@@ -32,7 +40,23 @@ const createContact = asyncHandler (async (req, res) => {
 //@access Public --  this will be private when we implement authentication
 
 const updateContact = asyncHandler(async (req, res) => {
-    res.status(200).json({message: `Update contact for ${req.params.id}`});
+    const contact = await Contact.findById(req.params.id);
+
+    if (!contact) {
+        res.status(404);
+        throw new Error("Contact not found");
+    }
+
+    const updatedContact = await Contact.findByIdAndUpdate(
+        req.params.id,
+        req.body,
+        { new: true }
+    );
+
+    res.status(200).json(updatedContact);
+    
+
+    res.status(200).json(updatedContact);
 });
 
 //@desc Get contact
@@ -40,7 +64,14 @@ const updateContact = asyncHandler(async (req, res) => {
 //@access Public --  this will be private when we implement authentication
 
 const getContact = asyncHandler(async (req, res) => {
-    res.status(200).json({message: `Get contact for ${req.params.id}`});
+
+    const contact = await Contact.findById(req.params.id);
+    if (!contact) {
+        res.status(404);
+        throw new Error("Contact not found");
+    }
+
+    res.status(200).json(contact);
 });
 
 //@desc Deletecontact
@@ -48,7 +79,14 @@ const getContact = asyncHandler(async (req, res) => {
 //@access Public --  this will be private when we implement authentication
 
 const deleteContact = asyncHandler(async (req, res) => {
-     res.status(200).json({message: `Delete contact for ${req.params.id}`});
+
+    const contact = await Contact.findByIdAndDelete(req.params.id); 
+    if (!contact) {
+        res.status(404);
+        throw new Error("Contact not found");
+    }
+
+     res.status(200).json(contact);
 });
 
 
