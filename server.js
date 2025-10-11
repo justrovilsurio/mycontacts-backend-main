@@ -21,6 +21,9 @@ app.use(express.json());
 
 app.use("/api/contacts", require("./routes/contactRoutes"));
 
+// implementation of authentication
+app.use("/api/users", require("./routes/userRoutes"));
+
 //custom middleware for transforming data like
 // what we receive during error in default middleware is not a json, but an html format
 
