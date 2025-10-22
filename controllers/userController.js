@@ -49,7 +49,7 @@ const registerUser = asyncHandler (async (req, res) => {
         res.status(400);
         throw new Error("User data is not valid");
     };
-    res.json({messge: "Register the user"});u
+    res.json({messge: "Register the user"});
     
 });
 
@@ -79,13 +79,15 @@ const loginUser = asyncHandler (async (req, res) => {
         },
         // generating jwt token and adding expiry time of 15 minutes
         process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: "1m" }
+        { expiresIn: "15m" }
         );
         res.status(200).json({ accessToken });
     } else {
         res.status(401);
         throw new Error("Email or password is not valid");
     }
+
+    res.json({messge: "Login the user"});
 });
 
 //@desc Current user info
@@ -93,20 +95,7 @@ const loginUser = asyncHandler (async (req, res) => {
 //@access Private -- only current user can see her data
 
 const currentUser = asyncHandler(async (req, res) => {
-    const User = await User.findById(req.params.id);
-
-    if (!User) {
-        res.status(404);
-        throw new Error("User not found");
-    }
-
-    const updatedUser = await User.findByIdAndUpdate(
-        req.params.id,
-        req.body,
-        { new: true }
-    );
-
-    res.status(200).json(updatedUser);
+    res.json({message: "Current user info", user: req.user});
     
 });
 
