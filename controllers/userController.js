@@ -4,6 +4,8 @@ const asyncHandler = require("express-async-handler");
 const User = require("../models/userModel");
 const bcrypt = require("bcrypt");
 
+const jwt = require("jsonwebtoken");
+
 
 // whenever we interact with mongodb and mongoose, we receive a promise
 
@@ -56,20 +58,34 @@ const registerUser = asyncHandler (async (req, res) => {
 //@access Public
 
 const loginUser = asyncHandler (async (req, res) => {
-    const {userName, email, password} = req.body;
+    const {email, password} = req.body;
 
-    if (!userName || !email || !password) {
+    if (!email || !password) {
         res.status(400);
         throw new Error("All fields are mandatory!");
     }
 
-    // creating the User object in the database
-    const User = await User.create({
-        userName,
-        email,
-        password
-    });
-    res.status(201).json(User);
+
+    // compare password with hashed password in database
+    const isUser = await User.findOne({ email });
+
+    if (isUser && (await bcrypt.compare(password, isUser.password))) {
+        const accessToken = jwt.sign({
+            user: {
+                username: isUser.userName,
+                email: isUser.email,
+                id: isUser.id
+            }
+        },
+        // generating jwt token and adding expiry time of 15 minutes
+        process.env.ACCESS_TOKEN_SECRET,
+        { expiresIn: "1m" }
+        );
+        res.status(200).json({ accessToken });
+    } else {
+        res.status(401);
+        throw new Error("Email or password is not valid");
+    }
 });
 
 //@desc Current user info
