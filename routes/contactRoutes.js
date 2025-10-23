@@ -7,8 +7,10 @@ const {
     updateContact,
     deleteContact
 } = require('../controllers/contactController');
+const validateToken = require('../middleware/validateTokenHandler');
 
-
+// to make routes protected
+router.use(validateToken);
 // router.route("/").get(getContacts).post(createContact);
 router.route("/").get(getContacts);
 
